@@ -27,7 +27,7 @@ include_directories(
 file(GLOB SOURCES "Sources/*.cpp")
 file(GLOB QT_HEADERS "Sources/Headers/QtHeaders/*.hpp")
 
-add_executable(OrchidPlayer ${SOURCES} ${QT_HEADERS} Sources/Headers/QtHeaders/ClickableQSlider.hpp)
+add_executable(OrchidPlayer ${SOURCES} ${QT_HEADERS})
 
 target_link_libraries(OrchidPlayer PUBLIC
         Qt::Core

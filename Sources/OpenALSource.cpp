@@ -7,29 +7,28 @@
 OpenALSource::OpenALSource(int numBuffer, ALint format, ALint sampleRate)
 {
     m_numBuffers = numBuffer;
-    uint32_t *arr = new uint32_t[numBuffer];
-    alGenBuffers(numBuffer, arr);
-    for(int i = 0; i < numBuffer; ++i)
-    {
-        m_bidQue.push(arr[i]);
-    }
-    alGenSources(1, &m_alSourcei);
-    m_Format = format;
-    m_SampleRate = sampleRate;
+    Init(format, sampleRate);
 }
 
 OpenALSource::OpenALSource(int numBuffer)
 {
     m_numBuffers = numBuffer;
-    uint32_t *arr = new uint32_t[numBuffer];
-    alGenBuffers(numBuffer, arr);
-    for(int i = 0; i < numBuffer; ++i)
+    Init();
+}
+
+void OpenALSource::Init(ALint format, ALint sampleRate)
+
+{
+    uint32_t *arr = new uint32_t[m_numBuffers];
+    alGenBuffers(m_numBuffers, arr);
+    for(int i = 0; i < m_numBuffers; ++i)
     {
         m_bidQue.push(arr[i]);
     }
+    delete[] arr;
     alGenSources(1, &m_alSourcei);
-    m_Format = AL_FORMAT_STEREO16;
-    m_SampleRate = 44100;
+    m_Format = format;
+    m_SampleRate = sampleRate;
 }
 
 OpenALSource& OpenALSource::PushData(const uint8_t *buf, size_t size)
@@ -114,24 +113,39 @@ int OpenALSource::GetNumQueued() const
 void OpenALSource::Close()
 {
     if(m_alSourcei == 0) return;
-    Stop();
-    alSourcei(m_alSourcei, AL_BUFFER, 0);
+    alDeleteSources(1, &m_alSourcei);
     while(!m_bidQue.empty())
     {
         OpenALBuffer buf(m_bidQue.front());
         m_bidQue.pop();
         buf.DeleteBuf();
     }
-    alDeleteSources(1, &m_alSourcei);
 }
 
 void OpenALSource::SetFormat(ALint format, ALint sampleRate)
 {
-    while(GetNumQueued())
-    {
-        Flush();
-    }
-    Stop();
+    Close();
     m_Format = format;
     m_SampleRate = sampleRate;
+    Init(m_Format, m_SampleRate);
 }
+
+void OpenALSource::SetVolume(float vol)
+{
+    alSourcef(m_alSourcei, AL_GAIN, vol);
+}
+
+void OpenALSource::SetSampleFormat(ALint sampleFormat)
+{
+    Close();
+    m_Format = sampleFormat;
+    Init(m_Format, m_SampleRate);
+}
+
+void OpenALSource::SetSampleRate(ALint sampleRate)
+{
+    Close();
+    m_SampleRate = sampleRate;
+    Init(m_Format, m_SampleRate);
+}
+

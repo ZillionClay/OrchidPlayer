@@ -96,3 +96,32 @@ void AudioReSampler::Close()
 {
     swr_free(&m_pSwrCtx);
 }
+
+void AudioReSampler::SetOutSampleFormat(AVSampleFormat format)
+{
+    m_eOutSmplFmt = format;
+    swr_free(&m_pSwrCtx);
+    SwrContext *pSwrCtx = swr_alloc();
+
+    swr_alloc_set_opts2(&pSwrCtx, &m_outChnlLayout, m_eOutSmplFmt, m_nOutSmplRate, &m_inChnlLayout,
+                        m_eInSmplFmt, m_nInSmplRate,
+                        0, nullptr  );
+
+    m_pSwrCtx = pSwrCtx;
+    swr_init(m_pSwrCtx);
+
+}
+
+void AudioReSampler::SetOutSampleRate(int sampleRate)
+{
+    m_nOutSmplRate = sampleRate;
+    swr_free(&m_pSwrCtx);
+    SwrContext *pSwrCtx = swr_alloc();
+
+    swr_alloc_set_opts2(&pSwrCtx, &m_outChnlLayout, m_eOutSmplFmt, m_nOutSmplRate, &m_inChnlLayout,
+                        m_eInSmplFmt, m_nInSmplRate,
+                        0, nullptr  );
+
+    m_pSwrCtx = pSwrCtx;
+    swr_init(m_pSwrCtx);
+}

@@ -8,6 +8,7 @@
 #include "OpenALBuffers.hpp"
 #include "OpenAL\al.h"
 #include "OpenAL\alc.h"
+#include "OpenAL/alext.h"
 #include "util.hpp"
 #include <queue>
 #include <thread>
@@ -18,12 +19,14 @@ private:
     ALint m_Format;
     ALint m_SampleRate;
     uint32_t m_alSourcei;
-    int m_numBuffers;
+    int m_numBuffers = 2;
     std::queue<uint32_t> m_bidQue;
 
     int GetNumProcessed() const;
     int GetNumQueued() const;
     int Flush();
+
+    void Init(ALint format = AL_FORMAT_STEREO_FLOAT32, ALint sampleRate = 44100);
 
 public:
 
@@ -49,6 +52,12 @@ public:
     void Stop();
 
     void Close();
+
+    void SetVolume(float vol);
+
+    void SetSampleFormat(ALint sampleFormat);
+
+    void SetSampleRate(ALint sampleRate);
 };
 
 

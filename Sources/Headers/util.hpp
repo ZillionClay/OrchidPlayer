@@ -87,6 +87,8 @@ namespace Util
         fprintf(stderr, "[ERR] ");
         fprintf(stderr, info.data(), std::forward<Args>(args)...);
     }
+
+
 }
 
 #endif //ORCHIDPLAYER_UTIL_HPP

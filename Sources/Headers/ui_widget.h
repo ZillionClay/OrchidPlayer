@@ -16,6 +16,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QWidget>
 #include "clickableqslider.hpp"
 
@@ -24,10 +25,10 @@ QT_BEGIN_NAMESPACE
 class Ui_Widget
 {
 public:
-    QPushButton *pushButton;
-    QPushButton *pushButton_2;
-    QPushButton *pushButton_3;
-    QPushButton *pushButton_4;
+    QPushButton *PlayButton;
+    QPushButton *PauseButton;
+    QPushButton *StopButton;
+    QPushButton *OpenButton;
     QLabel *label;
     QLineEdit *lineEdit;
     QLabel *label_2;
@@ -37,32 +38,39 @@ public:
     QComboBox *comboBox;
     QLabel *label_5;
     QCheckBox *checkBox;
-    QPushButton *pushButton_5;
+    QPushButton *RefreshButton;
+    QSlider *VolumeSlider;
+    QLabel *label_6;
+    QPushButton *BrowseButton;
+    QComboBox *SampleRateBox;
+    QComboBox *BitFormatBox;
+    QLabel *label_7;
+    QLabel *label_8;
 
     void setupUi(QWidget *Widget)
     {
         if (Widget->objectName().isEmpty())
             Widget->setObjectName("Widget");
         Widget->resize(845, 582);
-        pushButton = new QPushButton(Widget);
-        pushButton->setObjectName("pushButton");
-        pushButton->setGeometry(QRect(150, 320, 141, 51));
+        PlayButton = new QPushButton(Widget);
+        PlayButton->setObjectName("PlayButton");
+        PlayButton->setGeometry(QRect(150, 320, 141, 51));
         QFont font;
         font.setFamilies({QString::fromUtf8("Consolas")});
         font.setPointSize(12);
-        pushButton->setFont(font);
-        pushButton_2 = new QPushButton(Widget);
-        pushButton_2->setObjectName("pushButton_2");
-        pushButton_2->setGeometry(QRect(350, 320, 131, 51));
-        pushButton_2->setFont(font);
-        pushButton_3 = new QPushButton(Widget);
-        pushButton_3->setObjectName("pushButton_3");
-        pushButton_3->setGeometry(QRect(530, 320, 131, 51));
-        pushButton_3->setFont(font);
-        pushButton_4 = new QPushButton(Widget);
-        pushButton_4->setObjectName("pushButton_4");
-        pushButton_4->setGeometry(QRect(640, 70, 81, 31));
-        pushButton_4->setFont(font);
+        PlayButton->setFont(font);
+        PauseButton = new QPushButton(Widget);
+        PauseButton->setObjectName("PauseButton");
+        PauseButton->setGeometry(QRect(350, 320, 131, 51));
+        PauseButton->setFont(font);
+        StopButton = new QPushButton(Widget);
+        StopButton->setObjectName("StopButton");
+        StopButton->setGeometry(QRect(530, 320, 131, 51));
+        StopButton->setFont(font);
+        OpenButton = new QPushButton(Widget);
+        OpenButton->setObjectName("OpenButton");
+        OpenButton->setGeometry(QRect(640, 70, 81, 31));
+        OpenButton->setFont(font);
         label = new QLabel(Widget);
         label->setObjectName("label");
         label->setGeometry(QRect(90, 130, 641, 31));
@@ -104,16 +112,47 @@ public:
         checkBox->setObjectName("checkBox");
         checkBox->setGeometry(QRect(100, 400, 91, 31));
         checkBox->setFont(font1);
-        pushButton_5 = new QPushButton(Widget);
-        pushButton_5->setObjectName("pushButton_5");
-        pushButton_5->setGeometry(QRect(560, 450, 75, 24));
+        RefreshButton = new QPushButton(Widget);
+        RefreshButton->setObjectName("RefreshButton");
+        RefreshButton->setGeometry(QRect(560, 450, 75, 24));
+        VolumeSlider = new QSlider(Widget);
+        VolumeSlider->setObjectName("VolumeSlider");
+        VolumeSlider->setGeometry(QRect(760, 370, 20, 121));
+        VolumeSlider->setMaximum(100);
+        VolumeSlider->setValue(100);
+        VolumeSlider->setOrientation(Qt::Vertical);
+        label_6 = new QLabel(Widget);
+        label_6->setObjectName("label_6");
+        label_6->setGeometry(QRect(750, 500, 54, 16));
+        BrowseButton = new QPushButton(Widget);
+        BrowseButton->setObjectName("BrowseButton");
+        BrowseButton->setGeometry(QRect(730, 70, 81, 31));
+        BrowseButton->setFont(font);
+        SampleRateBox = new QComboBox(Widget);
+        SampleRateBox->setObjectName("SampleRateBox");
+        SampleRateBox->setGeometry(QRect(240, 500, 101, 22));
+        QFont font2;
+        font2.setFamilies({QString::fromUtf8("Consolas")});
+        SampleRateBox->setFont(font2);
+        BitFormatBox = new QComboBox(Widget);
+        BitFormatBox->setObjectName("BitFormatBox");
+        BitFormatBox->setGeometry(QRect(490, 500, 161, 22));
+        BitFormatBox->setFont(font2);
+        label_7 = new QLabel(Widget);
+        label_7->setObjectName("label_7");
+        label_7->setGeometry(QRect(100, 500, 141, 16));
+        label_7->setFont(font2);
+        label_8 = new QLabel(Widget);
+        label_8->setObjectName("label_8");
+        label_8->setGeometry(QRect(400, 500, 81, 16));
+        label_8->setFont(font2);
 
         retranslateUi(Widget);
-        QObject::connect(pushButton, SIGNAL(clicked()), Widget, SLOT(Play()));
-        QObject::connect(pushButton_3, SIGNAL(clicked()), Widget, SLOT(Stop()));
-        QObject::connect(pushButton_2, SIGNAL(clicked()), Widget, SLOT(Pause()));
-        QObject::connect(pushButton_4, SIGNAL(clicked()), Widget, SLOT(Open()));
-        QObject::connect(pushButton_5, SIGNAL(clicked()), Widget, SLOT(UpdateDeviceList()));
+        QObject::connect(PlayButton, SIGNAL(clicked()), Widget, SLOT(Play()));
+        QObject::connect(StopButton, SIGNAL(clicked()), Widget, SLOT(Stop()));
+        QObject::connect(PauseButton, SIGNAL(clicked()), Widget, SLOT(Pause()));
+        QObject::connect(OpenButton, SIGNAL(clicked()), Widget, SLOT(Open()));
+        QObject::connect(RefreshButton, SIGNAL(clicked()), Widget, SLOT(UpdateDeviceList()));
 
         QMetaObject::connectSlotsByName(Widget);
     } // setupUi
@@ -121,10 +160,10 @@ public:
     void retranslateUi(QWidget *Widget)
     {
         Widget->setWindowTitle(QCoreApplication::translate("Widget", "Widget", nullptr));
-        pushButton->setText(QCoreApplication::translate("Widget", "Play", nullptr));
-        pushButton_2->setText(QCoreApplication::translate("Widget", "Pause", nullptr));
-        pushButton_3->setText(QCoreApplication::translate("Widget", "Stop", nullptr));
-        pushButton_4->setText(QCoreApplication::translate("Widget", "Open", nullptr));
+        PlayButton->setText(QCoreApplication::translate("Widget", "Play", nullptr));
+        PauseButton->setText(QCoreApplication::translate("Widget", "Pause", nullptr));
+        StopButton->setText(QCoreApplication::translate("Widget", "Stop", nullptr));
+        OpenButton->setText(QCoreApplication::translate("Widget", "Open", nullptr));
         label->setText(QCoreApplication::translate("Widget", "Playing: ", nullptr));
         lineEdit->setText(QString());
         label_2->setText(QCoreApplication::translate("Widget", "URL:", nullptr));
@@ -132,7 +171,11 @@ public:
         label_4->setText(QCoreApplication::translate("Widget", "Current:", nullptr));
         label_5->setText(QCoreApplication::translate("Widget", "Output Device:", nullptr));
         checkBox->setText(QCoreApplication::translate("Widget", "Auto Loop", nullptr));
-        pushButton_5->setText(QCoreApplication::translate("Widget", "Refresh", nullptr));
+        RefreshButton->setText(QCoreApplication::translate("Widget", "Refresh", nullptr));
+        label_6->setText(QCoreApplication::translate("Widget", "Volume", nullptr));
+        BrowseButton->setText(QCoreApplication::translate("Widget", "Browse", nullptr));
+        label_7->setText(QCoreApplication::translate("Widget", "Output Sample Rate:", nullptr));
+        label_8->setText(QCoreApplication::translate("Widget", "Bit Format:", nullptr));
     } // retranslateUi
 
 };

@@ -22,15 +22,29 @@ class AudioPlayer : public IRecurrent
 {
 public:
     using Consumer = std::function<void(AudioPlayer&)>;
+    using Listener = std::function<void(AudioPlayer&)>;
+
+
+    struct PlayerListeners
+    {
+        std::vector<Listener> Open;
+        std::vector<Listener> Start;
+        std::vector<Listener> Run;
+        std::vector<Listener> Stop;
+        std::vector<Listener> Close;
+    };
+
+    PlayerListeners m_Listeners;
 
 private:
-
     OpenALSource m_Source;
     DecodeContext m_Decoder;
     AudioReSampler m_Resampler;
     ConcurrentQueue<Consumer> m_ConsumerQue;
     RecurrentController m_Controller;
-    int32_t m_OutSampleRate;
+    int32_t m_SampleRate = 44100;
+    int m_Channels = 2;
+    AVSampleFormat m_SampleFotmat = AV_SAMPLE_FMT_FLT;
     double m_Progress = NAN;
     double m_Duration = NAN;
     bool m_Ended = false;
@@ -44,6 +58,14 @@ private:
 
 public:
 
+    static ALint GetALFormat(AVSampleFormat format, int channels) noexcept(false);
+    static ALint GetSampleSize(AVSampleFormat format, int channels) noexcept(false);
+    static AVSampleFormat NarrowFormat(AVSampleFormat format);
+
+    int32_t GetSampleRate() const& {return m_SampleRate;}
+    int GetNumChannel() const& {return m_Channels;}
+    AVSampleFormat GetFormat() const& {return m_SampleFotmat;}
+
     std::atomic<bool> m_AutoLoop = false;
 
     AudioPlayer();
@@ -53,8 +75,12 @@ public:
     bool IsEnd() const& {return m_Ended;}
     bool Loaded() const& {return m_Loaded;}
 
-    bool Open(std::string_view url, int32_t outSampleRate = 44100);
-    bool Open(const DecodeContext &decoder, int32_t outSampleRate = 44100);
+    void SetVolume(float vol);
+    void SetSampleRate(int sampleRate);
+    void SetFormat(AVSampleFormat format);
+
+    bool Open(std::string_view url);
+    bool Open(const DecodeContext &decoder);
 
     bool Start();
 

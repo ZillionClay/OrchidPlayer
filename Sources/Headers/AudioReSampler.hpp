@@ -17,7 +17,7 @@ extern "C"
 
 class AudioReSampler
 {
-public:
+private:
 
     AVSampleFormat m_eOutSmplFmt;
     AVChannelLayout m_outChnlLayout;
@@ -29,6 +29,7 @@ public:
 
     SwrContext* m_pSwrCtx          = nullptr; // 重采样器上下文
 
+public:
     AudioReSampler() = default;
     AudioReSampler(const AVSampleFormat&    eOutSmplFmt,       // 输出音频格式
                   const AVSampleFormat&     eInSmplFmt,        // 输入音频格式
@@ -37,6 +38,9 @@ public:
                   int32_t                   nOutSmplRate,      // 输出音频采样率
                   int32_t                   nInSmplRate        // 输入音频采样率
                   );
+
+    void SetOutSampleFormat(AVSampleFormat format);
+    void SetOutSampleRate(int sampleRate);
 
     ~AudioReSampler() = default;
 

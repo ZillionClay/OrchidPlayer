@@ -7,6 +7,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QFileDialog>
 #include "AudioPlayer.hpp"
 
 QT_BEGIN_NAMESPACE
@@ -22,7 +23,8 @@ Q_OBJECT
 
 public:
     AudioPlayer* m_AudioPlayer;
-    QTimer* m_ProgressTimer = nullptr;
+    // QTimer* m_ProgressTimer = nullptr;
+    QFileDialog* m_QFileDialog = nullptr;
 
     explicit Widget(QWidget *parent = nullptr);
     explicit Widget(AudioPlayer* audioPlayer, QWidget *parent = nullptr);
@@ -34,19 +36,33 @@ public slots:
     void Pause();
     void Stop();
     void UpdateSliderValue();
-    void OnSlideValueChanged(int progress);
+    void OnSlideValueChanged(int precentage);
     void OnSlidePressed();
     void OnSlideClicked();
     void OnSlideReleased();
     void ReopenDevice(const QString& qstr);
     void UpdateDeviceList();
+    void OpenFileDialog();
+    void OnFileSelected();
+    void OnUpdateCurrentProgress(double progress);
 
 signals:
+    void UpdateCurrentProgressSignal(double progress);
 
 private:
     Ui::Widget *ui;
+
+    struct PlayStateRecord
+    {
+        bool isPlaying = false;
+        double current = -1;
+    };
+
+    PlayStateRecord m_StateRecord;
+
+    void SetUpUi();
+    void ConnectSlots();
     int m_DeviceListLength = 0;
-    bool m_PlayingBeforeMove = false;
     std::string *m_DeviceList = nullptr;
 };
 
