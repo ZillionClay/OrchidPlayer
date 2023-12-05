@@ -14,12 +14,7 @@ Widget::Widget(AudioPlayer* audioPlayer,QWidget *parent) :
 
     m_AudioPlayer->m_Listeners.Run.push_back(
             [this](AudioPlayer& player){
-                int percentage = lround(100 * player.Tell() / player.GetDuration());
-                ui->horizontalSlider->setValue(percentage);
-                int64_t cur = std::lround(player.Tell()*1000);
-                int64_t min = cur/60000, sec = (cur%60000)/1000, ms = (cur%60000)%1000;
-                std::string durText = std::format("{}min {:2}sec {:3}ms: {:3}%", min, sec, ms, percentage);
-                ui->label_4->setText(QString("Current: ")+QString(durText.data()));
+                emit Widget::UpdateCurrentProgressSignal(player.Tell() / player.GetDuration());
             });
     SetUpUi();
     ConnectSlots();
@@ -253,6 +248,7 @@ void Widget::SetUpUi()
     ui->SampleRateBox->addItem("192000Hz", 192000);
     ui->SampleRateBox->addItem("352800Hz", 352800);
     ui->SampleRateBox->addItem("384000Hz", 384000);
+
 
     ui->BitFormatBox->addItem("8bit", AVSampleFormat::AV_SAMPLE_FMT_U8);
     ui->BitFormatBox->addItem("16bit", AVSampleFormat::AV_SAMPLE_FMT_S16);
