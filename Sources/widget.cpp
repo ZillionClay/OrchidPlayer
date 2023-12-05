@@ -48,7 +48,7 @@ void Widget::Play()
     if(!m_AudioPlayer->Loaded()) return;
     if(m_AudioPlayer->IsEnd())
     {
-        m_AudioPlayer->Locate(0);
+        PlayerLocate(0);
         m_AudioPlayer->Start();
 //        if (m_ProgressTimer != nullptr)
 //            m_ProgressTimer->start(100);
@@ -66,7 +66,7 @@ void Widget::Play()
             second = ((double) ui->horizontalSlider->value() / 100) * m_AudioPlayer->GetDuration();
         }
 
-        m_AudioPlayer->Locate(second);
+        PlayerLocate(second);
         m_AudioPlayer->Start();
 //        if (m_ProgressTimer != nullptr)
 //            m_ProgressTimer->start(100);
@@ -105,7 +105,7 @@ void Widget::Open()
         Util::LOGEFMT("<Open> Cannot open url\n");
         return;
     }
-    ui->label->setText(QString("Playing: ")+ui->lineEdit->text());
+    ui->label->setText(QString("Playing: ")+QUrl(ui->lineEdit->text()).fileName());
 
     AVSampleFormat sampleFormat = AudioPlayer::NarrowFormat(m_AudioPlayer->GetFormat());
     int sampleRate = m_AudioPlayer->GetSampleRate();
@@ -154,7 +154,7 @@ void Widget::OnSlideClicked()
     if(!ui->horizontalSlider->m_Pressed)
     {
         double second = ((double) ui->horizontalSlider->value() / 100) * m_AudioPlayer->GetDuration();
-        m_AudioPlayer->Locate(second);
+        PlayerLocate(second);
         m_StateRecord.current = -1;
     }
 }
@@ -167,7 +167,7 @@ void Widget::OnSlideReleased()
         if(m_AudioPlayer->IsEnd())
             ui->horizontalSlider->setValue(0);
         double second = ((double) ui->horizontalSlider->value() / 100) * m_AudioPlayer->GetDuration();
-        m_AudioPlayer->Locate(second);
+        PlayerLocate(second);
         m_AudioPlayer->Start();
 //        if(m_ProgressTimer != nullptr)
 //            m_ProgressTimer->start(100);
@@ -229,12 +229,6 @@ void Widget::SetUpUi()
     QFont font;
     font.setFamilies({QString::fromUtf8("Consolas")});
     font.setPointSize(12);
-    if(m_QFileDialog == nullptr)
-    {
-        m_QFileDialog = new QFileDialog(this);
-        m_QFileDialog->setFont(font);
-        m_QFileDialog->setGeometry(300, 300, 800, 600);
-    }
 
     ui->SampleRateBox->addItem("11025Hz",  11025);
     ui->SampleRateBox->addItem("12000Hz",  12000);
@@ -258,9 +252,8 @@ void Widget::SetUpUi()
 
 void Widget::OpenFileDialog()
 {
-    if(m_QFileDialog != nullptr)
-        m_QFileDialog->show();
-    else SetUpUi();
+    QString path = QFileDialog::getOpenFileName(this, "Choose Music File");
+    ui->lineEdit->setText(path);
 }
 
 void Widget::ConnectSlots()
@@ -277,7 +270,6 @@ void Widget::ConnectSlots()
     UpdateDeviceList();
     connect(ui->comboBox, &QComboBox::currentTextChanged, this, &Widget::ReopenDevice);
     connect(ui->BrowseButton, &QPushButton::clicked, this, &Widget::OpenFileDialog);
-    connect(m_QFileDialog, &QFileDialog::fileSelected, this, &Widget::OnFileSelected);
     connect(ui->VolumeSlider, &QSlider::valueChanged,
             [this](int value)
             {
@@ -298,22 +290,25 @@ void Widget::ConnectSlots()
     connect(this, &Widget::UpdateCurrentProgressSignal, this, &Widget::OnUpdateCurrentProgress);
 }
 
-void Widget::OnFileSelected()
-{
-    if(m_QFileDialog)
-    {
-        QString fileUrl = m_QFileDialog->selectedFiles().first();
-        ui->lineEdit->setText(fileUrl);
-    }
-}
 
 void Widget::OnUpdateCurrentProgress(double progress)
 {
-    if(!m_AudioPlayer->Loaded() || !(progress == progress) || ui->horizontalSlider->m_Pressed) return;
+    if(!m_AudioPlayer->Loaded() || !(progress == progress) || ui->horizontalSlider->m_Pressed || !m_UpdateSlideByProgress) return;
     ui->horizontalSlider->setValue(lround(progress*100));
     int64_t cur = std::lround(progress*m_AudioPlayer->GetDuration()*1000);
     int64_t min = cur/60000, sec = (cur%60000)/1000, ms = (cur%60000)%1000;
     std::string durText = std::format("{}min {:2}sec {:3}ms: {:3}%", min, sec, ms, lround(progress*100));
     ui->label_4->setText(QString("Current: ")+QString(durText.data()));
 }
+
+void Widget::PlayerLocate(double second)
+{
+    m_UpdateSlideByProgress = false;
+    m_AudioPlayer->Locate(second,
+                          [this](AudioPlayer& player)
+                        {
+                            m_UpdateSlideByProgress = true;
+                        });
+}
+
 

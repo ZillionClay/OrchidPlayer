@@ -24,7 +24,6 @@ Q_OBJECT
 public:
     AudioPlayer* m_AudioPlayer;
     // QTimer* m_ProgressTimer = nullptr;
-    QFileDialog* m_QFileDialog = nullptr;
 
     explicit Widget(QWidget *parent = nullptr);
     explicit Widget(AudioPlayer* audioPlayer, QWidget *parent = nullptr);
@@ -43,7 +42,6 @@ public slots:
     void ReopenDevice(const QString& qstr);
     void UpdateDeviceList();
     void OpenFileDialog();
-    void OnFileSelected();
     void OnUpdateCurrentProgress(double progress);
 
 signals:
@@ -58,10 +56,13 @@ private:
         double current = -1;
     };
 
+    std::atomic<bool> m_UpdateSlideByProgress = true;
+
     PlayStateRecord m_StateRecord;
 
     void SetUpUi();
     void ConnectSlots();
+    void PlayerLocate(double progress);
     int m_DeviceListLength = 0;
     std::string *m_DeviceList = nullptr;
 };

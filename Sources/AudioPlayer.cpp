@@ -55,12 +55,6 @@ void AudioPlayer::ExecuteRun()
     AVFrame *pDstFrame = nullptr;
     AVPacket* pPacket = av_packet_alloc();
 
-    Consumer consumer;
-    while(m_ConsumerQue.dequeue(consumer))
-    {
-        consumer(*this);
-    }
-
     int res = av_read_frame(m_Decoder.m_pAvFormatCtx, pPacket);
     m_Ended = false;
     if (res == AVERROR_EOF)  // 正常读取到文件尾部退出
@@ -107,6 +101,12 @@ void AudioPlayer::ExecuteRun()
     }
 
     av_packet_free(&pPacket);
+
+    Consumer consumer;
+    while(m_ConsumerQue.dequeue(consumer))
+    {
+        consumer(*this);
+    }
 
     for(auto& listener: m_Listeners.Run)
     {
@@ -175,12 +175,14 @@ double AudioPlayer::GetDuration()
     return m_Duration;
 }
 
-void AudioPlayer::Locate(double second)
+void AudioPlayer::Locate(double second, const AudioPlayer::Callback &callback)
 {
-    m_ConsumerQue.enqueue(  [second](AudioPlayer& player)
+    m_ConsumerQue.enqueue(  [this, second, callback](AudioPlayer& player)
     {
         if(player.m_Decoder.m_pAvFormatCtx == nullptr) return;
         avformat_seek_file(player.m_Decoder.m_pAvFormatCtx, -1, INT_MIN, static_cast<int>(second*AV_TIME_BASE), INT_MAX, 0);
+        m_Progress = second;
+        callback(player);
     });
 }
 
@@ -315,3 +317,4 @@ AVSampleFormat AudioPlayer::NarrowFormat(AVSampleFormat format)
         default:                    return AV_SAMPLE_FMT_FLT;
     }
 }
+

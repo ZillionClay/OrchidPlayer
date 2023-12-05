@@ -23,6 +23,7 @@ class AudioPlayer : public IRecurrent
 public:
     using Consumer = std::function<void(AudioPlayer&)>;
     using Listener = std::function<void(AudioPlayer&)>;
+    using Callback = std::function<void(AudioPlayer&)>;
 
 
     struct PlayerListeners
@@ -92,7 +93,7 @@ public:
 
     double Tell();
 
-    void Locate(double second);
+    void Locate(double second, const Callback& callback = [](AudioPlayer&){});
 };
 
 
